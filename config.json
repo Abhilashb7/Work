@@ -93,9 +93,10 @@
   ],
   "automation_settings": {
     "headless": false,
-    "slow_mo": 100,
-    "timeout": 30000,
-    "wait_between_actions": 1000,
-    "max_retries": 3
+    "slow_mo": 20,
+    "timeout": 10000,
+    "wait_between_actions": 300,
+    "max_retries": 2,
+    "speed_mode": "super_fast"
   }
 }
