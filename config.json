@@ -1,0 +1,101 @@
+{
+  "user_info": {
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@email.com",
+    "phone": "+1-555-123-4567",
+    "address": "123 Main Street",
+    "city": "San Francisco",
+    "state": "California",
+    "zip_code": "94105",
+    "linkedin": "https://linkedin.com/in/johndoe",
+    "portfolio": "https://johndoe.dev",
+    "salary": "120000",
+    "cover_letter": "I am excited to apply for this position and believe my skills align perfectly with your requirements."
+  },
+  "attachments": {
+    "resume": "files/resume.pdf",
+    "cover_letter": "files/cover_letter.pdf"
+  },
+  "questions": [
+    {
+      "keywords": ["experience", "years", "work"],
+      "answer": "5+ years"
+    },
+    {
+      "keywords": ["authorized", "visa", "work authorization", "eligible"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["degree", "education", "qualification"],
+      "answer": "Bachelor's Degree"
+    },
+    {
+      "keywords": ["relocate", "relocation", "move", "willing to relocate"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["salary", "compensation", "expected salary", "pay"],
+      "answer": "120000"
+    },
+    {
+      "keywords": ["start", "available", "notice", "when can you start"],
+      "answer": "2 weeks"
+    },
+    {
+      "keywords": ["remote", "work from home", "hybrid"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["travel", "willing to travel"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["background", "check"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["drug", "test"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["gender", "pronouns"],
+      "answer": "Male"
+    },
+    {
+      "keywords": ["race", "ethnicity"],
+      "answer": "Prefer not to say"
+    },
+    {
+      "keywords": ["veteran", "military"],
+      "answer": "No"
+    },
+    {
+      "keywords": ["disability", "disabled"],
+      "answer": "No"
+    },
+    {
+      "keywords": ["referral", "how did you hear"],
+      "answer": "Company Website"
+    },
+    {
+      "keywords": ["website", "social media", "github"],
+      "answer": "https://github.com/johndoe"
+    },
+    {
+      "keywords": ["programming language", "preferred language"],
+      "answer": "Python"
+    },
+    {
+      "keywords": ["framework", "technology"],
+      "answer": "React"
+    }
+  ],
+  "automation_settings": {
+    "headless": false,
+    "slow_mo": 100,
+    "timeout": 30000,
+    "wait_between_actions": 1000,
+    "max_retries": 3
+  }
+}
