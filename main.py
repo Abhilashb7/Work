@@ -12,15 +12,14 @@ import time
 # --- Setup ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
-class SuperFastUniversalApplicant:
+class FastUniversalApplicant:
     def __init__(self, config_path="config.json"):
         self.config = self._load_config(config_path)
         self.user_info = self.config["user_info"]
         self.attachments = self.config["attachments"]
         self.questions = self.config["questions"]
         self.settings = self.config["automation_settings"]
-        self.login_handled = False
-        logging.info("🚀 Super Fast Enhanced configuration loaded successfully.")
+        logging.info("🚀 Fast Universal Applicant loaded successfully.")
 
     def _load_config(self, config_path):
         config_file = Path(config_path)
@@ -31,420 +30,422 @@ class SuperFastUniversalApplicant:
 
     async def apply(self, page: Page, job_details: dict):
         company_name = job_details.get("company", job_details.get("url"))
-        logging.info(f"🎯 Starting SUPER FAST application process for {company_name}")
+        logging.info(f"🎯 Starting application process for {company_name}")
         
-        # Check for login page first
+        # Wait for initial page load
+        await self._wait_for_page_load(page)
+        
+        # Check for login requirement
         if await self._detect_and_handle_login(page):
-            logging.info("🔐 Login detected and handled, proceeding with application...")
+            logging.info("✅ Login completed, proceeding with application...")
+            # Wait a bit more after login
+            await asyncio.sleep(2)
         
-        # Fast form filling pipeline
-        await self._super_fast_fill_pipeline(page)
+        # Use original proven form filling logic (but faster)
+        await self._fill_text_inputs(page)
+        await self._upload_attachments(page)
+        await self._handle_questions(page)
         
         self._update_tracker(job_details)
-        logging.info(f"⚡ SUPER FAST automation completed for {company_name}")
+        logging.info(f"✅ Application completed for {company_name}")
+
+    async def _wait_for_page_load(self, page: Page):
+        """Wait for page to be fully loaded"""
+        try:
+            await page.wait_for_load_state('domcontentloaded', timeout=10000)
+            await page.wait_for_load_state('networkidle', timeout=5000)
+            await asyncio.sleep(1)  # Reduced from 2 seconds
+        except TimeoutError:
+            logging.info("Page load timeout - proceeding anyway")
 
     async def _detect_and_handle_login(self, page: Page) -> bool:
-        """Detect login pages and handle user authentication"""
+        """Improved login detection"""
         logging.info("🔍 Checking for login requirements...")
         
-        # Wait briefly for page to load
-        await asyncio.sleep(1)
-        
-        # Login detection patterns
+        # More comprehensive login detection
         login_indicators = [
             "input[type='password']",
             "input[name*='password' i]",
             "input[id*='password' i]",
+            "input[name*='login' i]",
+            "input[id*='login' i]",
             "button:has-text('Sign In')",
             "button:has-text('Log In')",
             "button:has-text('Login')",
+            "button:has-text('Sign On')",
             "a:has-text('Sign In')",
             "a:has-text('Log In')",
-            "[data-testid*='login']",
-            "[data-testid*='signin']",
-            "form[action*='login']",
-            "form[action*='signin']",
+            "a:has-text('Login')",
+            "[data-automation-id*='login']",
+            "[data-automation-id*='signin']",
+            "form[name*='login' i]",
+            "form[action*='login' i]",
+            "form[action*='signin' i]",
             ".login-form",
             ".signin-form",
             "#login-form",
-            "#signin-form"
+            "#signin-form",
+            "[role='form']:has(input[type='password'])"
         ]
         
-        # Check for login indicators
-        login_detected = False
-        for indicator in login_indicators:
-            try:
-                if await page.locator(indicator).count() > 0:
-                    login_detected = True
-                    logging.info(f"🔐 Login detected: {indicator}")
-                    break
-            except:
-                continue
-        
-        # Also check for common login page titles/URLs
+        # Check URL and title patterns
         try:
             url = page.url.lower()
             title = await page.title()
             title_lower = title.lower()
             
-            login_url_patterns = ['login', 'signin', 'auth', 'sso', 'oauth', 'account']
-            login_title_patterns = ['login', 'sign in', 'authenticate', 'log in']
+            login_url_patterns = ['login', 'signin', 'auth', 'sso', 'oauth', 'account', 'portal']
+            login_title_patterns = ['login', 'sign in', 'authenticate', 'log in', 'portal', 'sso']
             
-            if any(pattern in url for pattern in login_url_patterns):
-                login_detected = True
-                logging.info(f"🔐 Login detected in URL: {url}")
+            url_login = any(pattern in url for pattern in login_url_patterns)
+            title_login = any(pattern in title_lower for pattern in login_title_patterns)
             
-            if any(pattern in title_lower for pattern in login_title_patterns):
-                login_detected = True
-                logging.info(f"🔐 Login detected in title: {title}")
+            if url_login or title_login:
+                logging.info(f"🔐 Login detected in URL/title: {url} | {title}")
+                return await self._handle_login_interaction(page)
                 
-        except:
-            pass
+        except Exception as e:
+            logging.debug(f"Error checking URL/title: {e}")
         
-        if login_detected:
-            return await self._handle_login_interaction(page)
+        # Check for login form elements
+        for indicator in login_indicators:
+            try:
+                if await page.locator(indicator).count() > 0:
+                    logging.info(f"🔐 Login detected: {indicator}")
+                    return await self._handle_login_interaction(page)
+            except Exception as e:
+                logging.debug(f"Error checking {indicator}: {e}")
         
         return False
 
     async def _handle_login_interaction(self, page: Page) -> bool:
         """Handle user login interaction"""
-        print("\n" + "🔐" * 60)
-        print("🔐 LOGIN REQUIRED")
-        print("🔐" * 60)
-        print(f"📱 Current URL: {page.url}")
-        print(f"📄 Page Title: {await page.title()}")
-        print("\n🚨 ATTENTION: This page requires login/authentication")
-        print("👤 Please complete the login process manually in the browser")
-        print("🔑 This may include:")
-        print("   • Username/Password login")
-        print("   • SSO (Single Sign-On)")
-        print("   • Two-factor authentication")
-        print("   • Account creation if needed")
-        print("\n⏳ The automation will resume once you're logged in...")
+        print("\n" + "🔐" * 80)
+        print("🔐 LOGIN REQUIRED - WORKDAY/ENTERPRISE PORTAL DETECTED")
+        print("🔐" * 80)
+        print(f"🌐 URL: {page.url}")
+        print(f"📄 Title: {await page.title()}")
+        print("\n🚨 MANUAL LOGIN REQUIRED")
+        print("Please complete the following steps:")
+        print("1. 👤 Enter your username/email")
+        print("2. 🔑 Enter your password")
+        print("3. 🔒 Complete SSO/2FA if required")
+        print("4. ✅ Wait for the main application page to load")
+        print("5. 🚀 The automation will resume automatically")
+        print("\n⏳ Waiting for you to complete login...")
         
         # Wait for user to complete login
         while True:
-            user_input = input("\n✋ Have you completed the login? (y/n/skip): ").lower().strip()
-            
-            if user_input in ['y', 'yes']:
-                # Verify login was successful
-                await asyncio.sleep(2)  # Wait for page to load after login
+            try:
+                user_input = input("\n✋ Press Enter when login is complete (or 'skip' to bypass): ").strip()
                 
-                # Check if we're still on a login page
-                still_on_login = await self._is_still_login_page(page)
+                if user_input.lower() == 'skip':
+                    print("⏭️  Skipping login detection...")
+                    return False
                 
-                if not still_on_login:
+                # Wait for page to load after login
+                await asyncio.sleep(3)
+                
+                # Check if we're still on login page
+                if await self._is_still_login_page(page):
+                    print("⚠️  Still on login page. Please complete login and try again.")
+                    continue
+                else:
                     print("✅ Login successful! Resuming automation...")
                     return True
-                else:
-                    print("⚠️  Still appears to be on login page. Please complete login and try again.")
-                    continue
                     
-            elif user_input in ['n', 'no']:
-                print("⏳ Waiting for you to complete login...")
-                await asyncio.sleep(5)  # Wait 5 seconds before asking again
-                continue
-                
-            elif user_input == 'skip':
-                print("⏭️  Skipping login detection, proceeding with automation...")
+            except KeyboardInterrupt:
+                print("\n❌ User cancelled login process")
                 return False
-                
-            else:
-                print("❓ Please enter 'y' for yes, 'n' for no, or 'skip' to skip login")
+            except Exception as e:
+                print(f"❌ Error during login: {e}")
+                return False
 
     async def _is_still_login_page(self, page: Page) -> bool:
         """Check if we're still on a login page"""
         try:
-            # Quick check for password fields (most reliable indicator)
-            password_fields = await page.locator("input[type='password']").count()
-            if password_fields > 0:
+            # Wait for any redirects to complete
+            await page.wait_for_load_state('networkidle', timeout=5000)
+            
+            # Check for password fields (strong indicator of login page)
+            if await page.locator("input[type='password']").count() > 0:
                 return True
             
-            # Check for common post-login elements
-            post_login_indicators = [
-                "button:has-text('Apply')",
-                "button:has-text('Submit Application')",
+            # Check for login buttons
+            login_buttons = [
+                "button:has-text('Sign In')",
+                "button:has-text('Log In')",
+                "button:has-text('Login')"
+            ]
+            
+            for button in login_buttons:
+                if await page.locator(button).count() > 0:
+                    return True
+            
+            # Check for common application form elements (indicates successful login)
+            app_indicators = [
                 "input[placeholder*='first name' i]",
                 "input[placeholder*='last name' i]",
                 "input[placeholder*='email' i]",
-                "[data-testid*='apply']",
+                "button:has-text('Apply')",
+                "button:has-text('Submit')",
+                "button:has-text('Submit Application')",
+                "[data-automation-id*='apply']",
                 ".application-form",
-                "#application-form"
+                "#application-form",
+                "form:has(input[placeholder*='name' i])"
             ]
             
-            for indicator in post_login_indicators:
+            for indicator in app_indicators:
                 if await page.locator(indicator).count() > 0:
-                    return False  # Found application form elements
+                    return False  # Found application form, login successful
             
-            return True  # Still seems to be login page
+            return True  # Assume still on login page
             
-        except:
-            return False  # Assume login was successful if we can't determine
+        except Exception as e:
+            logging.debug(f"Error checking login page: {e}")
+            return False  # Assume login was successful
 
-    async def _super_fast_fill_pipeline(self, page: Page):
-        """Super fast form filling pipeline with minimal delays"""
-        logging.info("⚡ Starting SUPER FAST form filling pipeline...")
+    async def _fill_text_inputs(self, page: Page):
+        """Original proven text input filling logic with speed optimizations"""
+        logging.info("📝 Filling text inputs...")
         
-        # Minimal wait for dynamic content
-        await asyncio.sleep(0.5)
-        
-        # Parallel execution of form filling tasks
-        tasks = [
-            self._lightning_fill_text_inputs(page),
-            self._lightning_handle_all_form_elements(page),
-            self._lightning_upload_attachments(page)
-        ]
-        
-        # Run all tasks concurrently for maximum speed
-        await asyncio.gather(*tasks, return_exceptions=True)
-        
-        logging.info("⚡ SUPER FAST form filling pipeline completed!")
-
-    async def _lightning_fill_text_inputs(self, page: Page):
-        """Lightning fast text input filling"""
-        logging.info("⚡ Lightning fast text input filling...")
-        
-        # Optimized field mappings with faster selectors
-        fast_field_mappings = {
-            'first_name': ['[name*="first" i]', '[placeholder*="first" i]', '[id*="first" i]'],
-            'last_name': ['[name*="last" i]', '[placeholder*="last" i]', '[id*="last" i]'],
-            'email': ['[name*="email" i]', '[placeholder*="email" i]', '[type="email"]'],
-            'phone': ['[name*="phone" i]', '[placeholder*="phone" i]', '[type="tel"]'],
-            'address': ['[name*="address" i]', '[placeholder*="address" i]'],
-            'city': ['[name*="city" i]', '[placeholder*="city" i]'],
-            'state': ['[name*="state" i]', '[placeholder*="state" i]'],
-            'zip_code': ['[name*="zip" i]', '[placeholder*="zip" i]', '[placeholder*="postal" i]'],
-            'linkedin': ['[name*="linkedin" i]', '[placeholder*="linkedin" i]'],
-            'portfolio': ['[name*="portfolio" i]', '[placeholder*="website" i]'],
-            'salary': ['[name*="salary" i]', '[placeholder*="salary" i]']
-        }
-        
-        # Create all fill tasks
-        fill_tasks = []
-        for field_key, value in self.user_info.items():
-            if value and field_key in fast_field_mappings:
-                selectors = fast_field_mappings[field_key]
-                fill_tasks.append(self._fast_fill_field(page, selectors, value, field_key))
-        
-        # Execute all fills concurrently
-        await asyncio.gather(*fill_tasks, return_exceptions=True)
-
-    async def _fast_fill_field(self, page: Page, selectors: list, value: str, field_name: str):
-        """Fast field filling with minimal timeout"""
-        for selector in selectors:
-            try:
-                element = page.locator(selector).first
-                if await element.count() > 0:
-                    await element.fill(value, timeout=1500)  # Reduced timeout for speed
-                    logging.info(f"⚡ FAST: Filled {field_name}")
-                    return True
-            except:
+        for key, value in self.user_info.items():
+            if not value: 
                 continue
-        return False
-
-    async def _lightning_handle_all_form_elements(self, page: Page):
-        """Lightning fast form element handling"""
-        logging.info("⚡ Lightning fast form element handling...")
-        
-        # Create all question handling tasks
-        question_tasks = []
-        for question in self.questions:
-            question_tasks.append(self._lightning_handle_question(page, question))
-        
-        # Execute all questions concurrently
-        await asyncio.gather(*question_tasks, return_exceptions=True)
-
-    async def _lightning_handle_question(self, page: Page, question: dict):
-        """Lightning fast single question handling"""
-        answer = question["answer"]
-        keywords = question["keywords"]
-        
-        # Fast strategy execution
-        for keyword in keywords:
-            # Try the most common strategies first (fastest to slowest)
-            if await self._fast_native_dropdown(page, keyword, answer):
-                return True
-            if await self._fast_custom_dropdown(page, keyword, answer):
-                return True
-            if await self._fast_radio_buttons(page, keyword, answer):
-                return True
-            if await self._fast_checkboxes(page, keyword, answer):
-                return True
-            if await self._fast_text_input_question(page, keyword, answer):
-                return True
-        
-        return False
-
-    async def _fast_native_dropdown(self, page: Page, keyword: str, answer: str) -> bool:
-        """Super fast native dropdown handling"""
-        fast_selectors = [
-            f"select[name*='{keyword}' i]",
-            f"select[id*='{keyword}' i]",
-            f"select[aria-label*='{keyword}' i]"
-        ]
-        
-        for selector in fast_selectors:
-            try:
-                element = page.locator(selector).first
-                if await element.count() > 0:
-                    # Try fastest selection methods
-                    try:
-                        await element.select_option(label=answer, timeout=1000)
-                        logging.info(f"⚡ FAST: Selected dropdown '{keyword}' = '{answer}'")
-                        return True
-                    except:
-                        try:
-                            await element.select_option(value=answer, timeout=1000)
-                            return True
-                        except:
-                            # Fast partial match
-                            options = await element.locator('option').all()
-                            for option in options[:10]:  # Limit to first 10 options for speed
-                                try:
-                                    option_text = await option.inner_text()
-                                    if answer.lower() in option_text.lower():
-                                        await element.select_option(label=option_text, timeout=1000)
-                                        return True
-                                except:
-                                    continue
-            except:
-                continue
-        return False
-
-    async def _fast_custom_dropdown(self, page: Page, keyword: str, answer: str) -> bool:
-        """Super fast custom dropdown handling"""
-        fast_triggers = [
-            f"[role='combobox'][aria-label*='{keyword}' i]",
-            f"button[aria-label*='{keyword}' i]",
-            f"div[data-testid*='{keyword}' i]"
-        ]
-        
-        for trigger_selector in fast_triggers:
-            try:
-                trigger = page.locator(trigger_selector).first
-                if await trigger.count() > 0:
-                    await trigger.click(timeout=1000)
-                    await asyncio.sleep(0.3)  # Minimal wait for dropdown
-                    
-                    # Fast option selection
-                    fast_options = [
-                        f"[role='option']:has-text('{answer}')",
-                        f"li:has-text('{answer}')",
-                        f"button:has-text('{answer}')"
-                    ]
-                    
-                    for option_selector in fast_options:
-                        try:
-                            option = page.locator(option_selector).first
-                            if await option.count() > 0:
-                                await option.click(timeout=1000)
-                                logging.info(f"⚡ FAST: Selected custom dropdown '{keyword}' = '{answer}'")
-                                return True
-                        except:
-                            continue
-            except:
-                continue
-        return False
-
-    async def _fast_radio_buttons(self, page: Page, keyword: str, answer: str) -> bool:
-        """Super fast radio button handling"""
-        fast_radio_selectors = [
-            f"input[type='radio'][value*='{answer}' i]",
-            f"label:has-text('{answer}') input[type='radio']"
-        ]
-        
-        for selector in fast_radio_selectors:
-            try:
-                radio = page.locator(selector).first
-                if await radio.count() > 0:
-                    await radio.check(timeout=1000)
-                    logging.info(f"⚡ FAST: Selected radio '{keyword}' = '{answer}'")
-                    return True
-            except:
-                continue
-        return False
-
-    async def _fast_checkboxes(self, page: Page, keyword: str, answer: str) -> bool:
-        """Super fast checkbox handling"""
-        if answer.lower() in ['yes', 'true', '1', 'agree', 'accept']:
-            fast_checkbox_selectors = [
-                f"input[type='checkbox'][name*='{keyword}' i]",
-                f"input[type='checkbox'][id*='{keyword}' i]"
+                
+            # Original proven selectors - keep the same logic but faster timeouts
+            selectors = [
+                f"input[name*='{key}' i]", 
+                f"input[id*='{key}' i]",
+                f"input[placeholder*='{key}' i]", 
+                f"input[aria-label*='{key}' i]",
+                f"input[data-automation-id*='{key}' i]",
+                f"textarea[name*='{key}' i]",
+                f"textarea[placeholder*='{key}' i]"
             ]
             
-            for selector in fast_checkbox_selectors:
-                try:
-                    checkbox = page.locator(selector).first
-                    if await checkbox.count() > 0:
-                        await checkbox.check(timeout=1000)
-                        logging.info(f"⚡ FAST: Checked '{keyword}'")
-                        return True
-                except:
-                    continue
-        return False
-
-    async def _fast_text_input_question(self, page: Page, keyword: str, answer: str) -> bool:
-        """Super fast text input handling for questions"""
-        fast_selectors = [
-            f"input[placeholder*='{keyword}' i]",
-            f"textarea[placeholder*='{keyword}' i]"
-        ]
-        
-        for selector in fast_selectors:
             try:
-                element = page.locator(selector).first
+                # Use original selector approach but with faster timeout
+                element = page.locator(", ".join(selectors)).first
                 if await element.count() > 0:
-                    await element.fill(answer, timeout=1000)
-                    logging.info(f"⚡ FAST: Filled text '{keyword}' = '{answer}'")
-                    return True
-            except:
-                continue
-        return False
+                    await element.fill(value, timeout=3000)  # Faster than original 5000
+                    logging.info(f"✅ Filled '{key}' with '{value}'")
+                else:
+                    logging.debug(f"⚠️  Could not find input for key: {key}")
+            except TimeoutError:
+                logging.debug(f"⚠️  Timeout filling '{key}'")
+            except Exception as e:
+                logging.debug(f"⚠️  Error filling '{key}': {e}")
 
-    async def _lightning_upload_attachments(self, page: Page):
-        """Lightning fast file upload"""
-        logging.info("⚡ Lightning fast file upload...")
-        
-        upload_tasks = []
+    async def _upload_attachments(self, page: Page):
+        """Original proven file upload logic"""
+        logging.info("📎 Uploading attachments...")
         
         resume_path = self.attachments.get("resume")
         if resume_path and Path(resume_path).exists():
-            upload_tasks.append(self._fast_upload_file(page, resume_path, "resume"))
-        
-        cover_letter_path = self.attachments.get("cover_letter")
-        if cover_letter_path and Path(cover_letter_path).exists():
-            upload_tasks.append(self._fast_upload_file(page, cover_letter_path, "cover"))
-        
-        # Execute uploads concurrently
-        await asyncio.gather(*upload_tasks, return_exceptions=True)
+            selectors = [
+                'input[type="file"]',
+                'input[accept*=".pdf"]',
+                'button:has-text("Attach Resume")', 
+                'button:has-text("Upload Resume")',
+                'button:has-text("Browse")',
+                'button:has-text("Choose File")',
+                '[data-automation-id*="resume"]',
+                '[data-automation-id*="upload"]'
+            ]
+            
+            for selector in selectors:
+                try:
+                    element = page.locator(selector).first
+                    if await element.count() > 0:
+                        if 'input[type="file"]' in selector:
+                            await element.set_input_files(resume_path)
+                            logging.info(f"✅ Uploaded resume: {resume_path}")
+                            break
+                        else:
+                            async with page.expect_file_chooser(timeout=3000) as fc_info:
+                                await element.click()
+                            file_chooser = await fc_info.value
+                            await file_chooser.set_files(resume_path)
+                            logging.info(f"✅ Uploaded resume: {resume_path}")
+                            break
+                except Exception as e:
+                    logging.debug(f"Upload attempt failed for {selector}: {e}")
+                    continue
+        else:
+            logging.warning("⚠️  Resume file not found")
 
-    async def _fast_upload_file(self, page: Page, file_path: str, file_type: str):
-        """Super fast file upload with minimal timeout"""
-        fast_upload_selectors = [
-            f'input[type="file"]',
-            f'input[accept*=".pdf"]',
-            f'button:has-text("Upload")',
-            f'button:has-text("Browse")'
-        ]
+    async def _handle_questions(self, page: Page):
+        """Original proven question handling logic with speed optimizations"""
+        logging.info("❓ Handling questions...")
         
-        for selector in fast_upload_selectors:
-            try:
-                element = page.locator(selector).first
-                if await element.count() > 0:
-                    if 'input[type="file"]' in selector:
-                        await element.set_input_files(file_path)
-                        logging.info(f"⚡ FAST: Uploaded {file_type}")
-                        return True
-                    else:
-                        async with page.expect_file_chooser(timeout=2000) as fc_info:
-                            await element.click()
-                        file_chooser = await fc_info.value
-                        await file_chooser.set_files(file_path)
-                        logging.info(f"⚡ FAST: Uploaded {file_type}")
-                        return True
-            except:
-                continue
-        return False
+        for question in self.questions:
+            handled = False
+            
+            for keyword in question["keywords"]:
+                if handled:
+                    break
+                    
+                try:
+                    # Strategy 1: Handle Dropdowns (HTML select) - Original approach
+                    dropdown_selectors = [
+                        f"select[name*='{keyword}' i]",
+                        f"select[id*='{keyword}' i]",
+                        f"select[aria-label*='{keyword}' i]",
+                        f"select[data-automation-id*='{keyword}' i]"
+                    ]
+                    
+                    for selector in dropdown_selectors:
+                        try:
+                            element = page.locator(selector).first
+                            if await element.count() > 0:
+                                # Try different selection methods
+                                try:
+                                    await element.select_option(label=question["answer"], timeout=2000)
+                                    logging.info(f"✅ Selected dropdown '{keyword}' = '{question['answer']}'")
+                                    handled = True
+                                    break
+                                except:
+                                    try:
+                                        await element.select_option(value=question["answer"], timeout=2000)
+                                        handled = True
+                                        break
+                                    except:
+                                        # Partial match
+                                        options = await element.locator('option').all()
+                                        for option in options:
+                                            try:
+                                                option_text = await option.inner_text()
+                                                if question["answer"].lower() in option_text.lower():
+                                                    await element.select_option(label=option_text, timeout=2000)
+                                                    logging.info(f"✅ Selected dropdown '{keyword}' = '{option_text}'")
+                                                    handled = True
+                                                    break
+                                            except:
+                                                continue
+                                        if handled:
+                                            break
+                        except Exception as e:
+                            logging.debug(f"Dropdown attempt failed: {e}")
+                            continue
+                    
+                    if handled:
+                        break
+                    
+                    # Strategy 2: Handle Custom Dropdowns (div-based) - Original approach
+                    custom_dropdown_triggers = [
+                        f"div[role='combobox'][aria-label*='{keyword}' i]",
+                        f"button[aria-label*='{keyword}' i]",
+                        f"div[data-automation-id*='{keyword}' i]",
+                        f"button[data-automation-id*='{keyword}' i]"
+                    ]
+                    
+                    for trigger_selector in custom_dropdown_triggers:
+                        try:
+                            trigger = page.locator(trigger_selector).first
+                            if await trigger.count() > 0:
+                                await trigger.click(timeout=2000)
+                                await asyncio.sleep(0.5)  # Wait for dropdown to open
+                                
+                                # Find and click option
+                                option_selectors = [
+                                    f"[role='option']:has-text('{question['answer']}')",
+                                    f"li:has-text('{question['answer']}')",
+                                    f"div:has-text('{question['answer']}')",
+                                    f"button:has-text('{question['answer']}')"
+                                ]
+                                
+                                for option_selector in option_selectors:
+                                    try:
+                                        option = page.locator(option_selector).first
+                                        if await option.count() > 0:
+                                            await option.click(timeout=2000)
+                                            logging.info(f"✅ Selected custom dropdown '{keyword}' = '{question['answer']}'")
+                                            handled = True
+                                            break
+                                    except:
+                                        continue
+                                
+                                if handled:
+                                    break
+                        except Exception as e:
+                            logging.debug(f"Custom dropdown attempt failed: {e}")
+                            continue
+                    
+                    if handled:
+                        break
+                    
+                    # Strategy 3: Handle Radio Buttons - Original approach
+                    radio_selectors = [
+                        f"input[type='radio'][value*='{question['answer']}' i]",
+                        f"input[type='radio'][data-automation-id*='{question['answer']}' i]"
+                    ]
+                    
+                    for selector in radio_selectors:
+                        try:
+                            radio = page.locator(selector).first
+                            if await radio.count() > 0:
+                                await radio.check(timeout=2000)
+                                logging.info(f"✅ Selected radio '{keyword}' = '{question['answer']}'")
+                                handled = True
+                                break
+                        except Exception as e:
+                            logging.debug(f"Radio attempt failed: {e}")
+                            continue
+                    
+                    if handled:
+                        break
+                    
+                    # Strategy 4: Handle Checkboxes - Original approach
+                    if question["answer"].lower() in ['yes', 'true', '1', 'agree', 'accept']:
+                        checkbox_selectors = [
+                            f"input[type='checkbox'][name*='{keyword}' i]",
+                            f"input[type='checkbox'][id*='{keyword}' i]",
+                            f"input[type='checkbox'][data-automation-id*='{keyword}' i]"
+                        ]
+                        
+                        for selector in checkbox_selectors:
+                            try:
+                                checkbox = page.locator(selector).first
+                                if await checkbox.count() > 0:
+                                    await checkbox.check(timeout=2000)
+                                    logging.info(f"✅ Checked '{keyword}'")
+                                    handled = True
+                                    break
+                            except Exception as e:
+                                logging.debug(f"Checkbox attempt failed: {e}")
+                                continue
+                    
+                    if handled:
+                        break
+                    
+                    # Strategy 5: Handle Text Inputs for questions - Original approach
+                    text_selectors = [
+                        f"input[placeholder*='{keyword}' i]",
+                        f"textarea[placeholder*='{keyword}' i]",
+                        f"input[aria-label*='{keyword}' i]",
+                        f"textarea[aria-label*='{keyword}' i]"
+                    ]
+                    
+                    for selector in text_selectors:
+                        try:
+                            element = page.locator(selector).first
+                            if await element.count() > 0:
+                                await element.fill(question["answer"], timeout=2000)
+                                logging.info(f"✅ Filled text '{keyword}' = '{question['answer']}'")
+                                handled = True
+                                break
+                        except Exception as e:
+                            logging.debug(f"Text input attempt failed: {e}")
+                            continue
+                    
+                except Exception as e:
+                    logging.debug(f"Error handling question for keyword '{keyword}': {e}")
+                    continue
+            
+            if not handled:
+                logging.warning(f"⚠️  Could not handle question: {question['keywords']}")
 
     def _update_tracker(self, job_details: dict):
         """Update job application tracker"""
@@ -470,37 +471,34 @@ class SuperFastUniversalApplicant:
         jobs.append(new_job)
         
         tracker_file.write_text(f"const jobData = {json.dumps(jobs, indent=2)};")
-        logging.info(f"Updated tracker with new application for {new_job['company']}.")
+        logging.info(f"📊 Updated tracker: {new_job['company']}")
 
 
-async def run_super_fast_batch_mode(csv_file_path: str):
-    """Super fast batch mode with login handling"""
-    logging.info(f"🚀 Starting SUPER FAST Batch Mode from file: {csv_file_path}")
+async def run_fast_batch_mode(csv_file_path: str):
+    """Fast batch mode with reliable login handling"""
+    logging.info(f"🚀 Starting FAST batch mode: {csv_file_path}")
+    
     try:
         with open(Path(csv_file_path), mode='r', encoding='utf-8') as csvfile:
             jobs_to_apply = list(csv.DictReader(csvfile))
     except FileNotFoundError:
-        logging.critical(f"FATAL: jobs.csv file not found at {csv_file_path}")
+        logging.critical(f"❌ jobs.csv not found: {csv_file_path}")
         return
 
-    applicant = SuperFastUniversalApplicant()
+    applicant = FastUniversalApplicant()
     
     async with async_playwright() as p:
+        # Optimized browser settings for speed while maintaining compatibility
         browser = await p.chromium.launch(
             channel="chrome",
             headless=applicant.settings.get("headless", False),
-            slow_mo=applicant.settings.get("slow_mo", 20),  # Much faster!
+            slow_mo=applicant.settings.get("slow_mo", 50),  # Balanced speed
             args=[
                 '--disable-blink-features=AutomationControlled',
                 '--no-first-run',
                 '--disable-extensions',
                 '--disable-plugins',
-                '--disable-images',  # Disable images for faster loading
-                '--disable-background-networking',
-                '--disable-background-timer-throttling',
-                '--disable-renderer-backgrounding',
-                '--disable-backgrounding-occluded-windows',
-                '--disable-client-side-phishing-detection'
+                '--disable-background-networking'
             ]
         )
         
@@ -508,48 +506,45 @@ async def run_super_fast_batch_mode(csv_file_path: str):
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         )
         page = await context.new_page()
-        
-        # Super fast timeouts
-        page.set_default_timeout(10000)  # Much faster timeout
-        
-        # Disable unnecessary requests for speed
-        await page.route("**/*.{png,jpg,jpeg,gif,svg,css,woff,woff2}", lambda route: route.abort())
+        page.set_default_timeout(applicant.settings.get("timeout", 15000))  # Balanced timeout
 
         for i, job in enumerate(jobs_to_apply):
             url = job.get("url", "").strip()
             if not url:
-                logging.warning(f"Skipping empty URL in row {i+2} of jobs.csv")
+                logging.warning(f"⚠️  Skipping empty URL in row {i+2}")
                 continue
 
             company_name = job.get("company", url)
-            print("\n" + "⚡" * 60)
-            logging.info(f"⚡ Processing Job {i+1}/{len(jobs_to_apply)}: {company_name}")
-            print(f"⚡ SUPER FAST Processing Job {i+1}/{len(jobs_to_apply)}: {company_name}")
+            print(f"\n{'='*80}")
+            print(f"🎯 Processing Job {i+1}/{len(jobs_to_apply)}: {company_name}")
+            print(f"🌐 URL: {url}")
+            print(f"{'='*80}")
             
             try:
                 await page.goto(url, wait_until="domcontentloaded", timeout=30000)
                 await applicant.apply(page, job)
                 
-                print(f"\n✅ SUPER FAST automation completed for {company_name}")
-                print("🔍 Please review the filled form and click submit if everything looks good.")
+                print(f"\n✅ Automation completed for {company_name}")
+                print("👀 Please review the filled form and click Submit if everything looks correct.")
                 
             except Exception as e:
-                logging.error(f"CRITICAL ERROR processing {url}: {e}")
-                print(f"ERROR: Failed to process {url}. Check logs. Moving to next job.")
+                logging.error(f"❌ Error processing {url}: {e}")
+                print(f"❌ Failed to process {url}. Moving to next job.")
                 continue
 
-            print("\n" + "⚡" * 60)
-            print("⚡ SUPER FAST AUTOMATION COMPLETED")
-            print("⚡" * 60)
+            print(f"\n{'='*80}")
+            print("🎉 AUTOMATION COMPLETED")
+            print(f"{'='*80}")
+            
             user_input = input("Press Enter to continue to next job, or type 'stop' to end: ")
             
             if user_input.lower() in ['stop', 'quit', 'exit', 'q']:
                 logging.info("User stopped the batch process.")
                 break
         
-        logging.info("🎉 SUPER FAST batch mode finished!")
-        print("\n" + "🎉" * 60)
-        print("🎉 SUPER FAST batch mode finished! All jobs processed.")
+        print(f"\n{'='*80}")
+        print("🎉 BATCH PROCESSING COMPLETED")
+        print(f"{'='*80}")
         await browser.close()
 
 if __name__ == "__main__":
@@ -558,4 +553,4 @@ if __name__ == "__main__":
         sys.exit(1)
     
     csv_path = sys.argv[1]
-    asyncio.run(run_super_fast_batch_mode(csv_path))
+    asyncio.run(run_fast_batch_mode(csv_path))

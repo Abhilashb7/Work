@@ -19,15 +19,15 @@
   },
   "questions": [
     {
-      "keywords": ["experience", "years", "work"],
+      "keywords": ["experience", "years", "work", "years of experience"],
       "answer": "5+ years"
     },
     {
-      "keywords": ["authorized", "visa", "work authorization", "eligible"],
+      "keywords": ["authorized", "visa", "work authorization", "eligible", "legally authorized"],
       "answer": "Yes"
     },
     {
-      "keywords": ["degree", "education", "qualification"],
+      "keywords": ["degree", "education", "qualification", "bachelor"],
       "answer": "Bachelor's Degree"
     },
     {
@@ -35,68 +35,75 @@
       "answer": "Yes"
     },
     {
-      "keywords": ["salary", "compensation", "expected salary", "pay"],
+      "keywords": ["salary", "compensation", "expected salary", "pay", "wage"],
       "answer": "120000"
     },
     {
-      "keywords": ["start", "available", "notice", "when can you start"],
+      "keywords": ["start", "available", "notice", "when can you start", "availability"],
       "answer": "2 weeks"
     },
     {
-      "keywords": ["remote", "work from home", "hybrid"],
+      "keywords": ["remote", "work from home", "hybrid", "location"],
       "answer": "Yes"
     },
     {
-      "keywords": ["travel", "willing to travel"],
+      "keywords": ["travel", "willing to travel", "business travel"],
       "answer": "Yes"
     },
     {
-      "keywords": ["background", "check"],
+      "keywords": ["background", "check", "background check"],
       "answer": "Yes"
     },
     {
-      "keywords": ["drug", "test"],
+      "keywords": ["drug", "test", "drug test", "screening"],
       "answer": "Yes"
     },
     {
-      "keywords": ["gender", "pronouns"],
+      "keywords": ["gender", "pronouns", "sex"],
       "answer": "Male"
     },
     {
-      "keywords": ["race", "ethnicity"],
+      "keywords": ["race", "ethnicity", "ethnic", "origin"],
       "answer": "Prefer not to say"
     },
     {
-      "keywords": ["veteran", "military"],
+      "keywords": ["veteran", "military", "armed forces"],
       "answer": "No"
     },
     {
-      "keywords": ["disability", "disabled"],
+      "keywords": ["disability", "disabled", "accommodation"],
       "answer": "No"
     },
     {
-      "keywords": ["referral", "how did you hear"],
+      "keywords": ["referral", "how did you hear", "source", "hear about"],
       "answer": "Company Website"
     },
     {
-      "keywords": ["website", "social media", "github"],
+      "keywords": ["website", "social media", "github", "portfolio site"],
       "answer": "https://github.com/johndoe"
     },
     {
-      "keywords": ["programming language", "preferred language"],
+      "keywords": ["programming language", "preferred language", "coding language"],
       "answer": "Python"
     },
     {
-      "keywords": ["framework", "technology"],
+      "keywords": ["framework", "technology", "tech stack", "tools"],
       "answer": "React"
+    },
+    {
+      "keywords": ["sponsorship", "sponsor", "visa sponsorship"],
+      "answer": "No"
+    },
+    {
+      "keywords": ["citizen", "citizenship", "us citizen"],
+      "answer": "Yes"
     }
   ],
   "automation_settings": {
     "headless": false,
-    "slow_mo": 20,
-    "timeout": 10000,
-    "wait_between_actions": 300,
-    "max_retries": 2,
-    "speed_mode": "super_fast"
+    "slow_mo": 50,
+    "timeout": 15000,
+    "wait_between_actions": 500,
+    "max_retries": 2
   }
 }
