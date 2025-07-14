@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - JobFlow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .dashboard-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section-header h2 {
+            color: #333;
+            margin: 0;
+        }
+
+        .applications-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .applications-table th,
+        .applications-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .applications-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-in-progress {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-applied {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-interviewing {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .profile-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .profile-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .profile-info h3 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .profile-item {
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .profile-item label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .profile-item span {
+            color: #333;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-info h4 {
+            margin: 0 0 0.25rem 0;
+            color: #333;
+        }
+
+        .activity-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .activity-date {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-section {
+                grid-template-columns: 1fr;
+            }
+
+            .applications-table {
+                font-size: 0.8rem;
+            }
+
+            .applications-table th,
+            .applications-table td {
+                padding: 0.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">🚀 JobFlow</div>
+        <div class="user-info">
+            <span id="userEmail">Loading...</span>
+            <button class="btn btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalApplications">-</div>
+                <div class="stat-label">Total Applications</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingApplications">-</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="appliedApplications">-</div>
+                <div class="stat-label">Applied</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="interviewingApplications">-</div>
+                <div class="stat-label">Interviewing</div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Your Profile</h2>
+                <button class="btn btn-primary" onclick="editProfile()">Edit Profile</button>
+            </div>
+            <div id="profileContent" class="loading">
+                Loading profile...
+            </div>
+        </div>
+
+        <!-- Applications Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Your Applications</h2>
+                <button class="btn btn-primary" onclick="refreshApplications()">Refresh</button>
+            </div>
+            <div id="applicationsContent" class="loading">
+                Loading applications...
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Recent Activity</h2>
+            </div>
+            <div id="activityContent" class="loading">
+                Loading activity...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let dashboardData = null;
+
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Load dashboard data on page load
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/dashboard`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Failed to load dashboard');
+                }
+
+                dashboardData = await response.json();
+                updateDashboard();
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showError('Failed to load dashboard data');
+            }
+        }
+
+        function updateDashboard() {
+            // Update user email
+            document.getElementById('userEmail').textContent = dashboardData.user.email;
+
+            // Update statistics
+            const applications = dashboardData.applications;
+            document.getElementById('totalApplications').textContent = applications.length;
+            document.getElementById('pendingApplications').textContent = 
+                applications.filter(app => app.status === 'Pending').length;
+            document.getElementById('appliedApplications').textContent = 
+                applications.filter(app => app.status === 'Applied').length;
+            document.getElementById('interviewingApplications').textContent = 
+                applications.filter(app => app.status === 'Interviewing').length;
+
+            // Update profile
+            updateProfile();
+
+            // Update applications table
+            updateApplicationsTable();
+
+            // Update recent activity
+            updateActivity();
+        }
+
+        function updateProfile() {
+            const profile = dashboardData.profile;
+            const profileContent = document.getElementById('profileContent');
+
+            if (!profile) {
+                profileContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>Profile Not Complete</h3>
+                        <p>Complete your profile to start receiving job applications.</p>
+                        <button class="btn btn-primary" onclick="editProfile()">Complete Profile</button>
+                    </div>
+                `;
+                return;
+            }
+
+            profileContent.innerHTML = `
+                <div class="profile-section">
+                    <div class="profile-info">
+                        <h3>Personal Information</h3>
+                        <div class="profile-item">
+                            <label>Name:</label>
+                            <span>${profile.first_name} ${profile.last_name}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Email:</label>
+                            <span>${dashboardData.user.email}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Phone:</label>
+                            <span>${profile.phone || 'Not provided'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Location:</label>
+                            <span>${profile.city && profile.state ? `${profile.city}, ${profile.state}` : 'Not provided'}</span>
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <h3>Professional Information</h3>
+                        <div class="profile-item">
+                            <label>Salary Expectation:</label>
+                            <span>${profile.salary_expectation || 'Not specified'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>LinkedIn:</label>
+                            <span>${profile.linkedin ? 'Provided' : 'Not provided'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Resume:</label>
+                            <span>${profile.resume_filename ? '✅ Uploaded' : '❌ Not uploaded'}</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>Cover Letter:</label>
+                            <span>${profile.cover_letter_filename ? '✅ Uploaded' : '❌ Not uploaded'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateApplicationsTable() {
+            const applications = dashboardData.applications;
+            const content = document.getElementById('applicationsContent');
+
+            if (applications.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3>No Applications Yet</h3>
+                        <p>Our team will start applying to jobs for you once your profile is complete.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let tableHTML = `
+                <table class="applications-table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Job Title</th>
+                            <th>Status</th>
+                            <th>Applied Date</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            applications.forEach(app => {
+                tableHTML += `
+                    <tr>
+                        <td>${app.company}</td>
+                        <td>${app.job_title}</td>
+                        <td><span class="status-badge status-${app.status.toLowerCase().replace(' ', '-')}">${app.status}</span></td>
+                        <td>${app.date_applied ? new Date(app.date_applied).toLocaleDateString() : '-'}</td>
+                        <td>${app.notes || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            content.innerHTML = tableHTML;
+        }
+
+        function updateActivity() {
+            const activity = dashboardData.recent_activity;
+            const content = document.getElementById('activityContent');
+
+            if (activity.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>No Recent Activity</h3>
+                        <p>Your recent application activity will appear here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let activityHTML = '';
+            activity.forEach(app => {
+                activityHTML += `
+                    <div class="activity-item">
+                        <div class="activity-info">
+                            <h4>${app.company} - ${app.job_title}</h4>
+                            <p>Status: ${app.status}</p>
+                        </div>
+                        <div class="activity-date">
+                            ${new Date(app.updated_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                `;
+            });
+
+            content.innerHTML = activityHTML;
+        }
+
+        async function refreshApplications() {
+            await loadDashboard();
+        }
+
+        function editProfile() {
+            // For now, redirect to homepage with edit mode
+            // In a full implementation, you'd have a profile edit modal/page
+            alert('Profile editing feature coming soon! Please contact support to update your profile.');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
+
+        function showError(message) {
+            alert(`Error: ${message}`);
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshApplications, 30000);
+    </script>
+</body>
+</html>

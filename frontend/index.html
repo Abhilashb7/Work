@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobFlow - Automated Job Applications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-section {
+            color: white;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .features li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .features li::before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-container h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .form-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .content-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">🚀 JobFlow</div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="showLogin()">Login</button>
+            <button class="btn btn-primary" onclick="showRegistration()">Get Started</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-container">
+            <div class="hero-section">
+                <h1>Automate Your Job Search</h1>
+                <p>Let our AI apply to hundreds of jobs while you sleep. We handle 95% of the work, you handle the final submissions.</p>
+                
+                <ul class="features">
+                    <li>Automated form filling across all major job boards</li>
+                    <li>Smart login management for multiple platforms</li>
+                    <li>Human-in-the-loop quality control</li>
+                    <li>Real-time dashboard tracking</li>
+                    <li>Professional application review</li>
+                    <li>Resume and cover letter optimization</li>
+                </ul>
+                
+                <button class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="showRegistration()">
+                    Start Applying Today
+                </button>
+            </div>
+
+            <div class="form-container">
+                <!-- Login Form -->
+                <div id="loginForm">
+                    <h2>Welcome Back</h2>
+                    <form onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                            Login to Dashboard
+                        </button>
+                    </form>
+                    <p style="text-align: center; margin-top: 1rem;">
+                        Don't have an account? <a href="#" onclick="showRegistration()" style="color: #667eea;">Sign up here</a>
+                    </p>
+                </div>
+
+                <!-- Registration & Onboarding Form -->
+                <div id="registrationForm" class="hidden">
+                    <h2>Join JobFlow</h2>
+                    <form onsubmit="handleRegistration(event)">
+                        <!-- Account Setup -->
+                        <div class="form-section">
+                            <h3>Account Setup</h3>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" required minlength="8">
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h3>Personal Information</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="firstName">First Name</label>
+                                    <input type="text" id="firstName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastName">Last Name</label>
+                                    <input type="text" id="lastName" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="linkedin">LinkedIn Profile</label>
+                                    <input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourprofile">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Address</label>
+                                <input type="text" id="address">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="city">City</label>
+                                    <input type="text" id="city">
+                                </div>
+                                <div class="form-group">
+                                    <label for="state">State</label>
+                                    <input type="text" id="state">
+                                </div>
+                                <div class="form-group">
+                                    <label for="zipCode">ZIP Code</label>
+                                    <input type="text" id="zipCode">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional Information -->
+                        <div class="form-section">
+                            <h3>Professional Information</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="salaryExpectation">Salary Expectation</label>
+                                    <input type="text" id="salaryExpectation" placeholder="e.g., 120000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="portfolio">Portfolio/Website</label>
+                                    <input type="url" id="portfolio" placeholder="https://yourwebsite.com">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="coverLetter">Cover Letter Template</label>
+                                <textarea id="coverLetter" rows="4" placeholder="Write a general cover letter template that we'll customize for each application..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- File Uploads -->
+                        <div class="form-section">
+                            <h3>Documents</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Resume (PDF)</label>
+                                    <div class="file-upload" onclick="document.getElementById('resume').click()">
+                                        <input type="file" id="resume" accept=".pdf" onchange="handleFileUpload(this, 'resumeStatus')">
+                                        <div id="resumeStatus">Click to upload your resume</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Cover Letter (PDF) - Optional</label>
+                                    <div class="file-upload" onclick="document.getElementById('coverLetterFile').click()">
+                                        <input type="file" id="coverLetterFile" accept=".pdf" onchange="handleFileUpload(this, 'coverLetterStatus')">
+                                        <div id="coverLetterStatus">Click to upload cover letter</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">
+                            Create Account & Continue
+                        </button>
+                    </form>
+                    <p style="text-align: center; margin-top: 1rem;">
+                        Already have an account? <a href="#" onclick="showLogin()" style="color: #667eea;">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 Welcome to JobFlow!</h2>
+            <p>Your account has been created successfully. You're being redirected to your dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <h2>⚠️ Error</h2>
+            <p id="errorMessage">Something went wrong. Please try again.</p>
+            <button onclick="closeModal('errorModal')" class="btn btn-primary" style="margin-top: 1rem;">OK</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registrationForm').classList.add('hidden');
+        }
+
+        function showRegistration() {
+            document.getElementById('registrationForm').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+        }
+
+        function handleFileUpload(input, statusId) {
+            const status = document.getElementById(statusId);
+            if (input.files.length > 0) {
+                status.textContent = `✓ ${input.files[0].name}`;
+                status.style.color = '#4CAF50';
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.access_token);
+                    window.location.href = '/dashboard';
+                } else {
+                    showError(data.detail || 'Login failed');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+        }
+
+        async function handleRegistration(event) {
+            event.preventDefault();
+
+            // First, create the user account
+            const userData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const userResponse = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (!userResponse.ok) {
+                    const error = await userResponse.json();
+                    throw new Error(error.detail || 'Registration failed');
+                }
+
+                // Login to get token
+                const loginResponse = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const loginData = await loginResponse.json();
+                if (!loginResponse.ok) {
+                    throw new Error('Login after registration failed');
+                }
+
+                const token = loginData.access_token;
+                localStorage.setItem('token', token);
+
+                // Create profile
+                const profileData = {
+                    first_name: document.getElementById('firstName').value,
+                    last_name: document.getElementById('lastName').value,
+                    phone: document.getElementById('phone').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zip_code: document.getElementById('zipCode').value,
+                    linkedin: document.getElementById('linkedin').value,
+                    portfolio: document.getElementById('portfolio').value,
+                    salary_expectation: document.getElementById('salaryExpectation').value,
+                    cover_letter: document.getElementById('coverLetter').value
+                };
+
+                const profileResponse = await fetch(`${API_BASE}/api/v1/profile`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                if (!profileResponse.ok) {
+                    throw new Error('Profile creation failed');
+                }
+
+                // Upload files
+                await uploadFiles(token);
+
+                // Show success and redirect
+                document.getElementById('successModal').classList.add('active');
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 2000);
+
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function uploadFiles(token) {
+            const resumeFile = document.getElementById('resume').files[0];
+            const coverLetterFile = document.getElementById('coverLetterFile').files[0];
+
+            if (resumeFile) {
+                const formData = new FormData();
+                formData.append('file', resumeFile);
+
+                await fetch(`${API_BASE}/api/v1/profile/upload-resume`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+            }
+
+            if (coverLetterFile) {
+                const formData = new FormData();
+                formData.append('file', coverLetterFile);
+
+                await fetch(`${API_BASE}/api/v1/profile/upload-cover-letter`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Show registration form by default
+        showRegistration();
+    </script>
+</body>
+</html>

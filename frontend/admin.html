@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - JobFlow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .admin-badge {
+            background: #ff9800;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .admin-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: #333;
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .applications-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .applications-table th,
+        .applications-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .applications-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-in-progress {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-applied {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-waiting-for-review {
+            background: #ffeaa7;
+            color: #fdcb6e;
+        }
+
+        .status-waiting-for-credentials {
+            background: #fab1a0;
+            color: #e17055;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .screenshot-preview {
+            max-width: 100%;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .admin-nav {
+                flex-direction: column;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .applications-table {
+                font-size: 0.8rem;
+            }
+
+            .applications-table th,
+            .applications-table td {
+                padding: 0.5rem;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">🚀 JobFlow Admin</div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span class="admin-badge">ADMIN</span>
+            <button class="btn btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="admin-nav">
+            <div class="nav-item active" onclick="showSection('dashboard')">📊 Dashboard</div>
+            <div class="nav-item" onclick="showSection('applications')">📝 Applications</div>
+            <div class="nav-item" onclick="showSection('pending-tasks')">⏳ Pending Tasks</div>
+            <div class="nav-item" onclick="showSection('create-application')">➕ Create Application</div>
+            <div class="nav-item" onclick="showSection('users')">👥 Users</div>
+        </nav>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="admin-section active">
+            <div class="section-header">
+                <h2>Admin Dashboard</h2>
+                <button class="btn btn-primary" onclick="refreshData()">Refresh</button>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalApplicationsAdmin">-</div>
+                    <div class="stat-label">Total Applications</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingTasksCount">-</div>
+                    <div class="stat-label">Pending Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedToday">-</div>
+                    <div class="stat-label">Completed Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="waitingReview">-</div>
+                    <div class="stat-label">Waiting Review</div>
+                </div>
+            </div>
+
+            <div id="alertsContainer"></div>
+        </div>
+
+        <!-- Applications Section -->
+        <div id="applications" class="admin-section">
+            <div class="section-header">
+                <h2>All Applications</h2>
+                <button class="btn btn-primary" onclick="loadApplications()">Refresh</button>
+            </div>
+            <div id="applicationsContent" class="loading">Loading applications...</div>
+        </div>
+
+        <!-- Pending Tasks Section -->
+        <div id="pending-tasks" class="admin-section">
+            <div class="section-header">
+                <h2>Pending Tasks</h2>
+                <button class="btn btn-warning" onclick="loadPendingTasks()">Refresh</button>
+            </div>
+            <div id="pendingTasksContent" class="loading">Loading pending tasks...</div>
+        </div>
+
+        <!-- Create Application Section -->
+        <div id="create-application" class="admin-section">
+            <div class="section-header">
+                <h2>Create New Application</h2>
+            </div>
+            
+            <form onsubmit="createApplication(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userId">Select User</label>
+                        <select id="userId" required>
+                            <option value="">Loading users...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Company Name</label>
+                        <input type="text" id="company" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="jobTitle">Job Title</label>
+                        <input type="text" id="jobTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jobUrl">Job URL</label>
+                        <input type="url" id="jobUrl" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Create Application & Queue Task
+                </button>
+            </form>
+        </div>
+
+        <!-- Users Section -->
+        <div id="users" class="admin-section">
+            <div class="section-header">
+                <h2>Users Management</h2>
+                <button class="btn btn-primary" onclick="loadUsers()">Refresh</button>
+            </div>
+            <div id="usersContent" class="loading">Loading users...</div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <h2>Review Application</h2>
+            <div id="reviewContent"></div>
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="completeTask()">✅ Complete & Submit</button>
+                <button class="btn btn-danger" onclick="failTask()">❌ Mark as Failed</button>
+                <button class="btn btn-secondary" onclick="closeModal('reviewModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Credentials Modal -->
+    <div id="credentialsModal" class="modal">
+        <div class="modal-content">
+            <h2>Add Job Board Credentials</h2>
+            <div id="credentialsContent">
+                <p>This user needs credentials for: <span id="requiredDomain"></span></p>
+                <div class="form-group">
+                    <label for="credEmail">Email/Username</label>
+                    <input type="email" id="credEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="credPassword">Password</label>
+                    <input type="password" id="credPassword" required>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="saveCredentials()">Save & Resume Task</button>
+                <button class="btn btn-secondary" onclick="closeModal('credentialsModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let currentTaskId = null;
+        let currentApplicationId = null;
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+            refreshData();
+        });
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Mark nav item as active
+            event.target.classList.add('active');
+            
+            // Load section-specific data
+            switch(sectionId) {
+                case 'applications':
+                    loadApplications();
+                    break;
+                case 'pending-tasks':
+                    loadPendingTasks();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+            }
+        }
+
+        async function refreshData() {
+            try {
+                // Load dashboard stats
+                const [applicationsRes, pendingRes] = await Promise.all([
+                    fetch(`${API_BASE}/admin/api/v1/applications`),
+                    fetch(`${API_BASE}/admin/api/v1/tasks/pending`)
+                ]);
+
+                const applications = await applicationsRes.json();
+                const pending = await pendingRes.json();
+
+                // Update stats
+                document.getElementById('totalApplicationsAdmin').textContent = applications.length;
+                document.getElementById('pendingTasksCount').textContent = pending.length;
+                
+                // Calculate completed today
+                const today = new Date().toDateString();
+                const completedToday = applications.filter(app => 
+                    app.status === 'Applied' && 
+                    app.date_applied && 
+                    new Date(app.date_applied).toDateString() === today
+                ).length;
+                document.getElementById('completedToday').textContent = completedToday;
+                
+                // Count waiting for review
+                const waitingReview = pending.filter(app => 
+                    app.status === 'In Progress' // This would be tasks waiting for review
+                ).length;
+                document.getElementById('waitingReview').textContent = waitingReview;
+
+                // Show alerts for pending actions
+                showAlerts(pending);
+
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+            }
+        }
+
+        function showAlerts(pendingTasks) {
+            const container = document.getElementById('alertsContainer');
+            const needsReview = pendingTasks.filter(t => t.status === 'In Progress').length;
+            const needsCredentials = pendingTasks.filter(t => t.status === 'Pending').length;
+
+            let alerts = '';
+            
+            if (needsReview > 0) {
+                alerts += `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ ${needsReview} applications need your review!</strong>
+                        <a href="#" onclick="showSection('pending-tasks')" style="margin-left: 1rem;">Review Now</a>
+                    </div>
+                `;
+            }
+            
+            if (needsCredentials > 0) {
+                alerts += `
+                    <div class="alert alert-danger">
+                        <strong>🔐 ${needsCredentials} applications need login credentials!</strong>
+                        <a href="#" onclick="showSection('pending-tasks')" style="margin-left: 1rem;">Add Credentials</a>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = alerts;
+        }
+
+        async function loadApplications() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/api/v1/applications`);
+                const applications = await response.json();
+                
+                const content = document.getElementById('applicationsContent');
+                
+                if (applications.length === 0) {
+                    content.innerHTML = '<div class="loading">No applications found.</div>';
+                    return;
+                }
+
+                let tableHTML = `
+                    <table class="applications-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Company</th>
+                                <th>Job Title</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                applications.forEach(app => {
+                    tableHTML += `
+                        <tr>
+                            <td>${app.id}</td>
+                            <td>User ${app.user_id}</td>
+                            <td>${app.company}</td>
+                            <td>${app.job_title}</td>
+                            <td><span class="status-badge status-${app.status.toLowerCase().replace(' ', '-')}">${app.status}</span></td>
+                            <td>${new Date(app.created_at).toLocaleDateString()}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-info" onclick="viewApplication(${app.id})">View</button>
+                                    ${app.status === 'In Progress' ? 
+                                        `<button class="btn btn-warning" onclick="reviewApplication(${app.id}, '${app.task_id}')">Review</button>` : 
+                                        ''
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += '</tbody></table>';
+                content.innerHTML = tableHTML;
+
+            } catch (error) {
+                document.getElementById('applicationsContent').innerHTML = 
+                    '<div class="alert alert-danger">Error loading applications</div>';
+            }
+        }
+
+        async function loadPendingTasks() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/api/v1/tasks/pending`);
+                const tasks = await response.json();
+                
+                const content = document.getElementById('pendingTasksContent');
+                
+                if (tasks.length === 0) {
+                    content.innerHTML = '<div class="loading">No pending tasks.</div>';
+                    return;
+                }
+
+                let cardsHTML = '';
+                tasks.forEach(task => {
+                    cardsHTML += `
+                        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border-left: 4px solid ${getStatusColor(task.status)};">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <h4>${task.company} - ${task.job_title}</h4>
+                                    <p style="color: #666; margin: 0.5rem 0;">Status: <span class="status-badge status-${task.status.toLowerCase().replace(' ', '-')}">${task.status}</span></p>
+                                    <p style="color: #666; margin: 0;">Created: ${new Date(task.created_at).toLocaleString()}</p>
+                                    ${task.error_message ? `<p style="color: #dc3545; margin: 0.5rem 0;"><strong>Error:</strong> ${task.error_message}</p>` : ''}
+                                </div>
+                                <div class="action-buttons">
+                                    ${getTaskActions(task)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                content.innerHTML = cardsHTML;
+
+            } catch (error) {
+                document.getElementById('pendingTasksContent').innerHTML = 
+                    '<div class="alert alert-danger">Error loading pending tasks</div>';
+            }
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'Pending': '#ffc107',
+                'In Progress': '#17a2b8',
+                'Failed': '#dc3545',
+                'Applied': '#28a745'
+            };
+            return colors[status] || '#6c757d';
+        }
+
+        function getTaskActions(task) {
+            switch(task.status) {
+                case 'Pending':
+                    return `<button class="btn btn-warning" onclick="addCredentials(${task.id}, '${task.job_url}')">Add Credentials</button>`;
+                case 'In Progress':
+                    return `
+                        <button class="btn btn-primary" onclick="reviewApplication(${task.id}, '${task.task_id}')">Review</button>
+                        <button class="btn btn-danger" onclick="failTask('${task.task_id}')">Mark Failed</button>
+                    `;
+                default:
+                    return `<button class="btn btn-info" onclick="viewApplication(${task.id})">View</button>`;
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                // This would need a users endpoint
+                const users = [
+                    { id: 1, email: 'user@example.com', name: 'John Doe' },
+                    { id: 2, email: 'jane@example.com', name: 'Jane Smith' }
+                ];
+
+                const userSelect = document.getElementById('userId');
+                userSelect.innerHTML = '<option value="">Select a user...</option>';
+                
+                users.forEach(user => {
+                    userSelect.innerHTML += `<option value="${user.id}">${user.name} (${user.email})</option>`;
+                });
+
+                const usersContent = document.getElementById('usersContent');
+                let usersHTML = `
+                    <table class="applications-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Applications</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                users.forEach(user => {
+                    usersHTML += `
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.email}</td>
+                            <td>${user.name}</td>
+                            <td>0</td>
+                            <td>
+                                <button class="btn btn-info" onclick="viewUser(${user.id})">View Profile</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                usersHTML += '</tbody></table>';
+                usersContent.innerHTML = usersHTML;
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        async function createApplication(event) {
+            event.preventDefault();
+            
+            const data = {
+                user_id: parseInt(document.getElementById('userId').value),
+                company: document.getElementById('company').value,
+                job_title: document.getElementById('jobTitle').value,
+                job_url: document.getElementById('jobUrl').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/api/v1/apply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Application created and queued successfully!');
+                    document.querySelector('#create-application form').reset();
+                    refreshData();
+                } else {
+                    alert('Error: ' + result.detail);
+                }
+
+            } catch (error) {
+                alert('Error creating application: ' + error.message);
+            }
+        }
+
+        function reviewApplication(applicationId, taskId) {
+            currentApplicationId = applicationId;
+            currentTaskId = taskId;
+            
+            document.getElementById('reviewContent').innerHTML = `
+                <p><strong>Application ID:</strong> ${applicationId}</p>
+                <p><strong>Task ID:</strong> ${taskId}</p>
+                <p>The application has been pre-filled and is ready for final review and submission.</p>
+                <div class="alert alert-warning">
+                    Please review the application in the browser and manually submit if everything looks correct.
+                </div>
+            `;
+            
+            document.getElementById('reviewModal').classList.add('active');
+        }
+
+        function addCredentials(applicationId, jobUrl) {
+            currentApplicationId = applicationId;
+            
+            // Extract domain from job URL
+            try {
+                const domain = new URL(jobUrl).hostname;
+                document.getElementById('requiredDomain').textContent = domain;
+            } catch (e) {
+                document.getElementById('requiredDomain').textContent = 'Unknown domain';
+            }
+            
+            document.getElementById('credentialsModal').classList.add('active');
+        }
+
+        async function saveCredentials() {
+            // This would save credentials and resume the task
+            // Implementation would depend on your credential storage system
+            alert('Credentials saved! Task will resume automatically.');
+            closeModal('credentialsModal');
+            loadPendingTasks();
+        }
+
+        async function completeTask() {
+            if (!currentTaskId) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/api/v1/tasks/${currentTaskId}/action`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'complete',
+                        notes: 'Manually reviewed and submitted'
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Task completed successfully!');
+                    closeModal('reviewModal');
+                    refreshData();
+                    loadPendingTasks();
+                } else {
+                    alert('Error completing task');
+                }
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function failTask(taskId = null) {
+            const id = taskId || currentTaskId;
+            if (!id) return;
+            
+            const reason = prompt('Enter reason for failure:');
+            if (!reason) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/api/v1/tasks/${id}/action`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'fail',
+                        notes: reason
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Task marked as failed');
+                    closeModal('reviewModal');
+                    refreshData();
+                    loadPendingTasks();
+                } else {
+                    alert('Error failing task');
+                }
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function viewApplication(applicationId) {
+            alert(`Viewing application ${applicationId} - Feature coming soon!`);
+        }
+
+        function viewUser(userId) {
+            alert(`Viewing user ${userId} profile - Feature coming soon!`);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            currentTaskId = null;
+            currentApplicationId = null;
+        }
+
+        function logout() {
+            window.location.href = '/';
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshData, 30000);
+    </script>
+</body>
+</html>
