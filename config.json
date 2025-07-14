@@ -1,0 +1,113 @@
+{
+  "user_info": {
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@email.com",
+    "phone": "+1-555-123-4567",
+    "address": "123 Main Street",
+    "city": "San Francisco",
+    "state": "California",
+    "zip_code": "94105",
+    "linkedin": "https://linkedin.com/in/johndoe",
+    "portfolio": "https://johndoe.dev",
+    "salary": "120000",
+    "cover_letter": "I am excited to apply for this position and believe my skills align perfectly with your requirements."
+  },
+  "login_credentials": {
+    "email": "your.email@example.com",
+    "password": "your_password_here"
+  },
+  "attachments": {
+    "resume": "files/resume.pdf",
+    "cover_letter": "files/cover_letter.pdf"
+  },
+  "questions": [
+    {
+      "keywords": ["experience", "years", "work", "years of experience"],
+      "answer": "5+ years"
+    },
+    {
+      "keywords": ["authorized", "visa", "work authorization", "eligible", "legally authorized"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["degree", "education", "qualification", "bachelor"],
+      "answer": "Bachelor's Degree"
+    },
+    {
+      "keywords": ["relocate", "relocation", "move", "willing to relocate"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["salary", "compensation", "expected salary", "pay", "wage"],
+      "answer": "120000"
+    },
+    {
+      "keywords": ["start", "available", "notice", "when can you start", "availability"],
+      "answer": "2 weeks"
+    },
+    {
+      "keywords": ["remote", "work from home", "hybrid", "location"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["travel", "willing to travel", "business travel"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["background", "check", "background check"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["drug", "test", "drug test", "screening"],
+      "answer": "Yes"
+    },
+    {
+      "keywords": ["gender", "pronouns", "sex"],
+      "answer": "Male"
+    },
+    {
+      "keywords": ["race", "ethnicity", "ethnic", "origin"],
+      "answer": "Prefer not to say"
+    },
+    {
+      "keywords": ["veteran", "military", "armed forces"],
+      "answer": "No"
+    },
+    {
+      "keywords": ["disability", "disabled", "accommodation"],
+      "answer": "No"
+    },
+    {
+      "keywords": ["referral", "how did you hear", "source", "hear about"],
+      "answer": "Company Website"
+    },
+    {
+      "keywords": ["website", "social media", "github", "portfolio site"],
+      "answer": "https://github.com/johndoe"
+    },
+    {
+      "keywords": ["programming language", "preferred language", "coding language"],
+      "answer": "Python"
+    },
+    {
+      "keywords": ["framework", "technology", "tech stack", "tools"],
+      "answer": "React"
+    },
+    {
+      "keywords": ["sponsorship", "sponsor", "visa sponsorship"],
+      "answer": "No"
+    },
+    {
+      "keywords": ["citizen", "citizenship", "us citizen"],
+      "answer": "Yes"
+    }
+  ],
+  "automation_settings": {
+    "headless": false,
+    "slow_mo": 25,
+    "timeout": 5000,
+    "wait_between_actions": 200,
+    "max_retries": 1
+  }
+}
